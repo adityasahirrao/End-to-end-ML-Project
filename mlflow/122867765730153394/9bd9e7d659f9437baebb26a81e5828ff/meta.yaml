@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/adity/Desktop/house-price-prediction/mlflow/122867765730153394/9bd9e7d659f9437baebb26a81e5828ff/artifacts
+end_time: 1743924382695
+entry_point_name: ''
+experiment_id: '122867765730153394'
+lifecycle_stage: active
+run_id: 9bd9e7d659f9437baebb26a81e5828ff
+run_name: silent-lamb-1
+run_uuid: 9bd9e7d659f9437baebb26a81e5828ff
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1743924365844
+status: 3
+tags: []
+user_id: adity
