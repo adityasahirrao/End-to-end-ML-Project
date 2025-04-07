@@ -137,8 +137,8 @@ pytest app/test_main.py
 ### 🐳 5. Build & Run Docker Image
 
 ```bash
-docker build -t house-price-app .
-docker run -p 8000:80 house-price-app
+docker build -t house-price-prediction-ecr-repo .
+docker run -p 8000:80 house-price-prediction-ecr-repo
 ```
 
 📍 App available at: `http://localhost:8000`
