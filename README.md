@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 # 🏡 End-to-End House Price Prediction ML Project
 
 Welcome to the **House Price Prediction** project — a complete **End-to-End ML pipeline** built using Python, Docker, FastAPI, MLflow and AWS ECS. This project demonstrates how to take a machine learning model from training to deployment in production! 🚀
@@ -169,7 +167,6 @@ docker run -p 8000:80 house-price-prediction-ecr-repo
 | `CONTAINER_NAME`         | Docker container name            |
 
 📌 **Trigger:** Push to `main` branch → deploys to ECS automatically ✅
-
 
 
 
