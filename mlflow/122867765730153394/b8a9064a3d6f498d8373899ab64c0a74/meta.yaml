@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/adity/Desktop/house-price-prediction/mlflow/122867765730153394/b8a9064a3d6f498d8373899ab64c0a74/artifacts
+end_time: 1744034107875
+entry_point_name: ''
+experiment_id: '122867765730153394'
+lifecycle_stage: active
+run_id: b8a9064a3d6f498d8373899ab64c0a74
+run_name: receptive-gull-266
+run_uuid: b8a9064a3d6f498d8373899ab64c0a74
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1744034086719
+status: 3
+tags: []
+user_id: adity

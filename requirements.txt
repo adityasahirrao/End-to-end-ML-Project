@@ -8,3 +8,5 @@ joblib
 mlflow
 requests
 pytest
+boto3
+awscli
