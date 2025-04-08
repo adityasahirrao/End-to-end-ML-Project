@@ -1,0 +1,85 @@
+✅ FASTAPI DOCKER CONTAINER DEPLOYMENT ON AWS ECS (Public URL Access)
+
+ - Follow youtube video : https://youtu.be/pJ_nCklQ65w?si=sCaP6ctzbbGtdFgb
+
+1️. Create ECR Repository
+--------------------------------
+- Go to AWS Console > ECR > Create Repository
+- Name: house-price-prediction-ecr-repo (or your project name)
+- Leave settings as default
+- Click "Create Repository"
+
+2️. Push Docker Image to ECR
+--------------------------------
+- Click on the created repo > View "Push Commands"
+- Run the below in VS Code terminal:
+
+# Authenticate Docker to your ECR
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <aws_account_id>.dkr.ecr.us-east-1.amazonaws.com
+
+# Build Docker Image
+docker build -t house-price-prediction-ecr-repo .
+
+# Tag the Image
+docker tag house-price-prediction-ecr-repo:latest <aws_account_id>.dkr.ecr.us-east-1.amazonaws.com/house-price-prediction-ecr-repo:latest
+
+# Push to ECR
+docker push <aws_account_id>.dkr.ecr.us-east-1.amazonaws.com/house-price-prediction-ecr-repo:latest
+
+3️. Create ECS Cluster
+--------------------------------
+- Go to AWS Console > ECS > Clusters > Create Cluster
+- Choose: "Networking only (Fargate)"
+- Name: house-price-prediction-cluster
+- VPC: Leave default or create custom
+- Click "Create"
+
+4️. Create Task Definition
+--------------------------------
+- Go to ECS > Task Definitions > Create new
+- Launch Type: FARGATE
+- Task Name: house-price-prediction-task
+- Task Role: ecsTaskExecutionRole
+- Container:
+  - Name: house-price-prediction-container
+  - Image: <ECR Image URL from step 2>
+  - Port Mappings: Container Port = 80
+- Memory: 2 GB, CPU: 1 vCPU
+- Click "Create"
+
+5️. Create ECS Service
+--------------------------------
+- Go to ECS > Clusters > Your Cluster > Services tab > Create
+- Launch Type: FARGATE
+- Task Definition: Select from dropdown
+- Service Name: house-price-prediction-service
+- Number of tasks: 1
+- Cluster VPC: Select default or existing
+- Security Group: Create new or select existing
+  - Ensure Port 80 is allowed from 0.0.0.0/0 (for public access)
+- Load Balancer: Optional (add ALB if HTTPS needed)
+- Click "Create Service"
+
+6️. Access Public URL
+--------------------------------
+- Go to ECS > Clusters > Your Cluster > Tasks
+- Select running Task > Click ENI (Elastic Network Interface) > IPv4 Public IP
+- Open http://<public-ip>/ in browser or Postman
+
+📌 Optional (HTTPS Setup)
+--------------------------------
+- Set up Route53 with your domain
+- Create ACM SSL Certificate for your domain (must be public)
+- Attach domain + HTTPS cert to ALB, and point ALB to ECS service
+
+📌 Optional (Auto-scaling)
+--------------------------------
+- Go to ECS Service > Auto Scaling
+- Add rules for CPU/Memory-based scaling
+
+📌 Optional (API Gateway)
+--------------------------------
+- Use API Gateway to expose ECS service with:
+  - Rate limiting
+  - Auth
+  - HTTPS support without ALB
