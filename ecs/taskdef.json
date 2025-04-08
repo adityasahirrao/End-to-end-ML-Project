@@ -1,0 +1,32 @@
+{
+    "family": "house-price-prediction-ecs-task-def",
+    "networkMode": "awsvpc",
+    "containerDefinitions": [
+      {
+        "name": "house-price-prediction-container",
+        "image": "445567096374.dkr.ecr.us-east-1.amazonaws.com/house-price-prediction-ecr-repo:latest",
+        "cpu": 0,
+        "portMappings": [
+          {
+            "containerPort": 80,
+            "hostPort": 80,
+            "protocol": "tcp"
+          }
+        ],
+        "essential": true,
+        "logConfiguration": {
+          "logDriver": "awslogs",
+          "options": {
+            "awslogs-group": "/ecs/house-price-prediction-ecs-task-def",
+            "awslogs-region": "us-east-1",
+            "awslogs-stream-prefix": "ecs"
+          }
+        }
+      }
+    ],
+    "requiresCompatibilities": ["FARGATE"],
+    "cpu": "1024",
+    "memory": "2048",
+    "executionRoleArn": "arn:aws:iam::445567096374:role/ecsTaskExecutionRole"
+  }
+  
