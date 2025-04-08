@@ -1,0 +1,47 @@
+name: Deploy to ECS
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+  IMAGE_TAG: ${{ secrets.IMAGE_TAG }}
+  IMAGE_URI: 445567096374.dkr.ecr.us-east-1.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:${{ secrets.IMAGE_TAG }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      run: |
+        aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin 445567096374.dkr.ecr.us-east-1.amazonaws.com
+
+    - name: Build, Tag, and Push Docker Image to ECR
+      run: |
+        docker build -t $ECR_REPOSITORY .
+        docker tag $ECR_REPOSITORY:$IMAGE_TAG $IMAGE_URI
+        docker push $IMAGE_URI
+
+    - name: Register new task definition
+      run: |
+        sed -e "s|IMAGE_URI|$IMAGE_URI|" ecs-task-def.json > new-task-def.json
+        aws ecs register-task-definition --cli-input-json file://new-task-def.json
+
+    - name: Update ECS service to use new task definition
+      run: |
+        NEW_TASK_DEF_ARN=$(aws ecs describe-task-definition --task-definition ${{ secrets.TASK_DEFINITION_FAMILY }} --query "taskDefinition.taskDefinitionArn" --output text)
+        aws ecs update-service --cluster ${{ secrets.CLUSTER_NAME }} --service ${{ secrets.SERVICE_NAME }} --task-definition $NEW_TASK_DEF_ARN
