@@ -22,7 +22,7 @@ class HouseFeaturesBatch(BaseModel):
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to the House Price Prediction API"}
+    return {"message": "Welcome to the House Price Prediction API : latest"}
 
 
 @app.get("/health")
