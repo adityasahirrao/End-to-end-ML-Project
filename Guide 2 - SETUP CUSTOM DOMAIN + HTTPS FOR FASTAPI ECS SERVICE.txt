@@ -1,0 +1,80 @@
+✅ SETUP CUSTOM DOMAIN + HTTPS FOR FASTAPI ECS SERVICE (ACM + Route 53 + ALB)
+
+📌 Prerequisites:
+-----------------------
+- You already deployed the ECS service (Fargate) with a public IP or using Load Balancer
+- You have a domain purchased and managed in **Route 53**
+- You want HTTPS support using **SSL (ACM certificate)**
+
+1️. Create SSL Certificate in ACM
+---------------------------------------
+- Go to AWS Console → **ACM (Certificate Manager)** → Request a certificate
+- Type: Public Certificate
+- Add domain name: `yourdomain.com` and optionally `www.yourdomain.com`
+- Select DNS validation → Next → Confirm & Request
+- Click the domain row → Expand → Copy CNAME values
+- Go to **Route 53 → Hosted Zones → yourdomain.com → Create record**
+  - Type: CNAME
+  - Paste the copied values
+- Wait a few minutes → ACM Status will show ✅ **Issued**
+
+2️. Create an Application Load Balancer (ALB)
+---------------------------------------
+- Go to **EC2 → Load Balancers → Create Load Balancer**
+- Type: **Application Load Balancer**
+- Name: `house-price-prediction-alb`
+- Scheme: internet-facing
+- IP type: IPv4
+- Listeners: HTTP (80), add HTTPS (443)
+- VPC: Choose same as ECS Cluster
+- Availability Zones: Pick at least 2 subnets
+- Click Next: Security Groups → allow ports 80 and 443
+- Click Next: Target Group
+  - Name: `ecs-target-group`
+  - Target type: IP
+  - Protocol: HTTP
+  - Port: 80
+- Register targets: Skip for now (will auto-link later)
+- Create Load Balancer
+
+3️. Attach HTTPS Listener with ACM Cert
+---------------------------------------
+- Go to Load Balancer > Listeners tab > HTTPS (443) → View/Edit rules
+- Add rule to forward all traffic to your target group
+- Attach your ACM certificate to HTTPS listener
+
+4️. Update ECS Service to use ALB
+---------------------------------------
+- Go to ECS → Clusters → your cluster → Services → house-price-prediction-service
+- Click Update → Edit Load Balancing
+  - Load Balancer Type: Application Load Balancer
+  - Select your ALB and listener (port 80 or 443)
+  - Choose existing target group (ecs-target-group)
+- Update the service → It will re-deploy tasks and register targets
+
+5️. Point Domain to Load Balancer
+---------------------------------------
+- Go to **Route 53 → Hosted Zones → yourdomain.com**
+- Create new Record:
+  - Type: A (Alias)
+  - Alias to: Application Load Balancer
+  - Choose your ALB DNS name
+- Save the record
+
+6️. Test Domain + HTTPS
+---------------------------------------
+- Open https://yourdomain.com → ✅ FastAPI app secured with SSL!
+- You can now hide the public IP and access only via domain
+
+📌 Extra Optional Tips:
+---------------------------------------
+- Add automatic HTTP to HTTPS redirect in listener rules
+- Add `/health` check endpoint in FastAPI for Load Balancer health check
+- Enable CloudWatch logs for Load Balancer to monitor requests
+
+✅ You now have:
+---------------------------------------
+✔️ FastAPI app on ECS Fargate  
+✔️ GitHub CI/CD deploying via Actions  
+✔️ HTTPS secured via ACM  
+✔️ Domain pointed via Route 53  

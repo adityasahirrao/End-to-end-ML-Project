@@ -1,0 +1,73 @@
+✅ ENABLE AUTO-SCALING, BLUE-GREEN DEPLOYMENT & ERROR HANDLING ON ECS
+
+📌 Prerequisites:
+-----------------------
+- Your ECS Fargate service is deployed and working
+- You're using an Application Load Balancer (ALB)
+- You want to scale based on CPU/Memory or target utilization
+
+1️. Enable Auto-Scaling for ECS Service
+---------------------------------------
+- Go to **ECS → Clusters → Your Cluster → Services**
+- Click your service (e.g. house-price-prediction-service)
+- Actions → **Auto Scaling → Create**
+
+📌 Set Auto Scaling Policy:
+- Minimum tasks: 1  
+- Maximum tasks: 3 (or more based on needs)
+
+🎯 Scaling Policy:
+- Target tracking
+- Metric type: ECS Service Average CPU Utilization
+- Target value: 50% (scale out when above 50%)
+
+💡 Optional: Add memory-based scaling too
+
+- Click "Create" → Auto-scaling now active!
+
+2️. Implement Blue-Green Deployment (Canary Style)
+---------------------------------------
+- Go to **ECS → Task Definitions → Create New Revision** of your task
+  - Update the image tag or env variable
+  - Register new revision
+
+- Go to **ECS → Services → Update**
+  - Choose updated task definition revision
+  - Deployment type: Rolling update or **Blue/Green via CodeDeploy** (for advanced)
+
+💡 For Blue/Green:
+- Set up **CodeDeploy App** + **Deployment Group**
+- Connect ALB Listener rules for green and blue environments
+- Use weighted routing for gradual rollout (e.g., 10% → 50% → 100%)
+
+🎯 Alternative: Use GitHub Actions to trigger update with new revision
+
+3️. Add Custom Error Pages (Optional)
+---------------------------------------
+- Go to **EC2 → Load Balancers → Your ALB → Listeners**
+- Click HTTPS (443) → Edit Rules
+
+📌 Add fixed response rule:
+- Condition: Path is `/not-found` or `/error`
+- Action: Fixed Response
+  - Status code: 404 or 500
+  - Content-type: text/html
+  - Message body: Custom HTML or message
+
+💡 OR: Route errors to a separate Lambda or microservice
+
+4️. Monitor Health and Logs
+---------------------------------------
+- Go to **CloudWatch → Logs**
+  - Check ECS logs, task logs, ALB logs (enable in Load Balancer > Attributes)
+
+- Enable Alerts:
+  - Go to **CloudWatch Alarms**
+  - Set CPU/Memory thresholds to get email/SMS alerts
+
+✅ You now have:
+---------------------------------------
+✔️ Auto-scaling based on CPU/memory  
+✔️ Safer deployments via blue-green strategy  
+✔️ Custom error handling via ALB rules  
+✔️ Monitoring and alerts for full observability  

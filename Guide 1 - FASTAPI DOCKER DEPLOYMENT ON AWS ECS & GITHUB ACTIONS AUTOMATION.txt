@@ -1,4 +1,6 @@
+-------------------------------------------------------------------------------------------------------
 ✅ FASTAPI DOCKER CONTAINER DEPLOYMENT ON AWS ECS (Public URL Access)
+-------------------------------------------------------------------------------------------------------
 
  - Follow youtube video : https://youtu.be/pJ_nCklQ65w?si=sCaP6ctzbbGtdFgb
 
@@ -83,3 +85,70 @@ docker push <aws_account_id>.dkr.ecr.us-east-1.amazonaws.com/house-price-predict
   - Rate limiting
   - Auth
   - HTTPS support without ALB
+
+-------------------------------------------------------------------------------------------------------
+✅ Automate ECS Deployment with GitHub Actions
+-------------------------------------------------------------------------------------------------------
+
+7️. Automate ECS Deployment with GitHub Actions
+------------------------------------------------
+
+🔹 Folder Structure (in root of your project):
+
+- ecs/
+  └── taskdef.json
+- .github/
+  └── workflows/
+      └── deploy.yml
+
+
+8️. Add `taskdef.json` File
+------------------------------------------------
+
+9️. Add deploy.yml File
+------------------------------------------------
+
+10. Add GitHub Repository Secrets
+------------------------------------------------
+Go to your GitHub repo → Settings → Secrets → Actions → Add the following:
+
+ - AWS_ACCESS_KEY_ID = Your IAM user's access key
+ - AWS_SECRET_ACCESS_KEY = Your IAM user's secret key
+ - AWS_REGION = us-east-1
+ - ECR_REPOSITORY = house-price-prediction-ecr-repo   (This is with respect to my project setup)
+ - IMAGE_TAG = latest (or main or version tag)
+ - CLUSTER_NAME = house-price-prediction-cluster      (This is with respect to my project setup)
+ - SERVICE_NAME = house-price-prediction-service      (This is with respect to my project setup)
+
+✅ Optional:
+
+TASK_DEFINITION_FAMILY = house-price-prediction-ecs-task-def (if needed for manual ARN fetch)
+
+🔐 11. Security Group - Inbound Rules
+------------------------------------------------
+✅ Allow Port 80 (HTTP) for public access:
+
+ - Type: HTTP
+ - Port: 80
+ - Source: 0.0.0.0/0
+
+✅ To support HTTPS (SSL) in future:
+
+ - Type: HTTPS
+ - Port: 443
+ - Source: 0.0.0.0/0
+
+⚙️ Extra Tips:
+------------------------------------------------
+ - Use ACM + Route 53 + Application Load Balancer for HTTPS with your domain.
+ - Add health check path in ECS service (e.g., /health) if needed.
+ - Use .env file locally to manage Docker ENV vars and use ENV inside Dockerfile.
+
+🎯 Final Step:
+------------------------------------------------
+ - Commit and push changes to the main branch on GitHub.
+ - GitHub Actions will auto-trigger, build Docker image, push to ECR, and update ECS service.
+
+ - Visit your Task → ENI → Public IP in browser:
+http://<public-ip> ✅
+
