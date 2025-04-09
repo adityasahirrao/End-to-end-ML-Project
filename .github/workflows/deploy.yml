@@ -36,12 +36,16 @@ jobs:
         docker tag $ECR_REPOSITORY:$IMAGE_TAG $IMAGE_URI
         docker push $IMAGE_URI
 
-    - name: Register new task definition
+    - name: Register new task definition and save ARN
+      id: register_task_def
       run: |
         sed -e "s|IMAGE_URI|$IMAGE_URI|" ecs/taskdef.json > new-task-def.json
-        aws ecs register-task-definition --cli-input-json file://new-task-def.json
+        TASK_DEF_ARN=$(aws ecs register-task-definition --cli-input-json file://new-task-def.json --query "taskDefinition.taskDefinitionArn" --output text)
+        echo "task_def_arn=$TASK_DEF_ARN" >> $GITHUB_OUTPUT
 
     - name: Update ECS service to use new task definition
       run: |
-        NEW_TASK_DEF_ARN=$(aws ecs describe-task-definition --task-definition ${{ secrets.TASK_DEFINITION_FAMILY }} --query "taskDefinition.taskDefinitionArn" --output text)
-        aws ecs update-service --cluster ${{ secrets.CLUSTER_NAME }} --service ${{ secrets.SERVICE_NAME }} --task-definition $NEW_TASK_DEF_ARN
+        aws ecs update-service \
+          --cluster ${{ secrets.CLUSTER_NAME }} \
+          --service ${{ secrets.SERVICE_NAME }} \
+          --task-definition ${{ steps.register_task_def.outputs.task_def_arn }}

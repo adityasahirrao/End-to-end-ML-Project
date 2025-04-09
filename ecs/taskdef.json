@@ -4,7 +4,7 @@
     "containerDefinitions": [
       {
         "name": "house-price-prediction-container",
-        "image": "445567096374.dkr.ecr.us-east-1.amazonaws.com/house-price-prediction-ecr-repo:latest",
+        "image": "IMAGE_URI",
         "cpu": 0,
         "portMappings": [
           {
