@@ -10,3 +10,4 @@ requests
 pytest
 boto3
 awscli
+httpx
