@@ -41,7 +41,7 @@ if st.sidebar.checkbox("🌙 Enable Dark Mode"):
 
 st.title("🏡 House Price Prediction")
 
-BACKEND_URL = "http://98.82.117.95"
+BACKEND_URL = "http://<Public-url>"
 HEADERS = ['longitude', 'latitude', 'housing_median_age', 'total_rooms', 'total_bedrooms', 'population', 'households', 'median_income']
 
 if page == "Single Prediction":
